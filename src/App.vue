@@ -1,42 +1,43 @@
-<template>
-  <div>
-    <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/weather">Weather</router-link>
-  </nav>
-  <router-view></router-view>
-  </div>
-</template>
+<script setup>
+import { ref } from 'vue'
+import SearchInput from './components/SearchInput.vue'
+import WeatherCard from './components/WeatherCard.vue'
 
-<script>
-import WeatherCard from './components/WeatherCard.vue';
-import WeatherChart from './components/WeatherChart.vue';
+// لیست مکان‌ها
+const places = ref([])
 
-export default {
-  name: 'App',
-  components: {
-    WeatherCard,
-    WeatherChart,
-  },
-};
+// متد برای حذف مکان
+const deletePlace = (name) => {
+  if (confirm('آیا مطمئن هستید؟')) {
+    places.value = places.value.filter((p) => p.location.name !== name)
+  }
+}
 </script>
 
-<style>
-#app {
-  font-family: 'Arial', sans-serif;
-  margin: 0;
-  padding: 0;
-  text-align: center;
-  background-color: #f0f4f8;
-}
-header {
-  background-color: #007acc;
-  color: white;
-  padding: 10px;
-}
-nav {
-  display: flex;
-  gap: 20px;
-}
+<template>
+  <main>
+    <!-- نمایش تاریخ -->
+    <div class="text-center mb-6">
+      {{
+        new Date().toLocaleDateString('en-us', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        })
+      }}
+    </div>
 
-</style>
+    <!-- جستجو -->
+    <div>
+      <SearchInput v-model="places" />
+    </div>
+
+    <!-- کارت‌های آب‌وهوا -->
+    <div class="grid grid-cols-2 gap-4">
+      <div v-for="(place, idx) in places" :key="idx">
+        <WeatherCard :place="place" @delete-place="deletePlace" />
+      </div>
+    </div>
+  </main>
+</template>
